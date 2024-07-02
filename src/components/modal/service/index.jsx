@@ -28,8 +28,17 @@ const Index = ({ open, handleClose, item }) => {
   };
 
   const handleSubmit = async (values) => {
+    const payload = { id: item.id, ...values };
     if (item) {
-      alert();
+      try {
+        const response = await service.update(payload);
+        if (response.status === 200) {
+          window.location.reload();
+        }
+        handleClose();
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       try {
         const response = await service.create(values);
