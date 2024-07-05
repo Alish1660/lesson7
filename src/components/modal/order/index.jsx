@@ -25,7 +25,7 @@ const Fade = ({ children, in: open }) => {
 };
 
 const Index = ({ open, handleClose, item }) => {
-  console.log(item, "item");
+  console.log(item, "item"); // Log item to check its content
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -42,12 +42,22 @@ const Index = ({ open, handleClose, item }) => {
     fetchData();
   }, []);
 
-  const initialValues = {
-    client_full_name: "",
-    client_phone_number: "",
-    amount: "",
-    service_id: "",
-  };
+  // Set initial values based on whether editing an existing item or creating a new one
+  const initialValues = item
+    ? {
+        client_full_name: item.client_full_name || "",
+        client_phone_number: item.client_phone_number || "",
+        amount: item.amount || "",
+        service_id: item.service_id || "",
+      }
+    : {
+        client_full_name: "",
+        client_phone_number: "",
+        amount: "",
+        service_id: "",
+      };
+
+  console.log("initialValues:", initialValues); // Log initialValues for debugging
 
   const handleSubmit = async (values) => {
     if (item) {
@@ -97,7 +107,7 @@ const Index = ({ open, handleClose, item }) => {
           }}
         >
           <Typography variant="h5" sx={{ my: 2, textAlign: "center" }}>
-            Create Order
+            {item ? "Edit Order" : "Create Order"}
           </Typography>
           <Formik
             initialValues={initialValues}
