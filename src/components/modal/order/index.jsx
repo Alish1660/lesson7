@@ -6,10 +6,14 @@ import {
   Typography,
   Button,
   TextField,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { serviceValidationSchema } from "../../../utils/validation";
+import { orderValidationSchema } from "../../../utils/validation";
+import service from "../../../service/service";
 import order from "../../../service/order";
+import { useState, useEffect } from "react";
 
 const Fade = ({ children, in: open }) => {
   const style = {
@@ -20,37 +24,53 @@ const Fade = ({ children, in: open }) => {
   return <div style={style}>{open ? children : null}</div>;
 };
 
-const Index = ({ open, handleClose }) => {
-  //   console.log(item, "item");
-  //   const initialValues = {
-  //     name: item?.name ? item?.name : "",
-  //     price: item?.price ? item?.price : "",
-  //   };
+const Index = ({ open, handleClose, item }) => {
+  console.log(item, "item");
+  const [data, setData] = useState([]);
 
-  //   const handleSubmit = async (values) => {
-  //     const payload = { id: item.id, ...values };
-  //     if (item) {
-  //       try {
-  //         const response = await service.update(payload);
-  //         if (response.status === 200) {
-  //           window.location.reload();
-  //         }
-  //         handleClose();
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     } else {
-  //       try {
-  //         const response = await service.create(values);
-  //         if (response.status === 201) {
-  //           window.location.reload();
-  //         }
-  //         handleClose();
-  //       } catch (error) {
-  //         console.error("Error creating service:", error);
-  //       }
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await service.get();
+        if (response.status === 200 && response.data?.services) {
+          setData(response.data.services);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const initialValues = {
+    client_full_name: "",
+    client_phone_number: "",
+    amount: "",
+    service_id: "",
+  };
+
+  const handleSubmit = async (values) => {
+    if (item) {
+      const payload = { id: item.id, ...values };
+      try {
+        const response = await order.update(payload);
+        if (response.status === 201) {
+          window.location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const response = await order.create(values);
+        if (response.status === 201) {
+          window.location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <Modal
@@ -77,85 +97,101 @@ const Index = ({ open, handleClose }) => {
           }}
         >
           <Typography variant="h5" sx={{ my: 2, textAlign: "center" }}>
-            Create Service
+            Create Order
           </Typography>
           <Formik
-          // initialValues={initialValues}
-          // onSubmit={handleSubmit}
-          // validationSchema={serviceValidationSchema}
+            initialValues={initialValues}
+            onSubmit={handleSubmit}
+            validationSchema={orderValidationSchema}
           >
             {({ isSubmitting }) => (
               <Form>
                 <Field
-                  name="name"
+                  name="client_full_name"
                   type="text"
                   as={TextField}
                   label="Name"
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  helperText={<ErrorMessage name="name" />}
+                  helperText={
+                    <ErrorMessage
+                      name="client_full_name"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
                 />
                 <Field
-                  name="price"
-                  type="number"
+                  name="client_phone_number"
+                  type="text"
                   as={TextField}
-                  label="Price"
+                  label="Phone"
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  helperText={<ErrorMessage name="price" />}
+                  helperText={
+                    <ErrorMessage
+                      name="client_phone_number"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
                 />
+                <Field
+                  name="amount"
+                  type="number"
+                  as={TextField}
+                  label="Amount"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  helperText={
+                    <ErrorMessage
+                      name="amount"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
+                />
+                <Field
+                  name="service_id"
+                  as={Select}
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  displayEmpty
+                  inputProps={{
+                    name: "service_id",
+                    id: "service_id",
+                  }}
+                  helperText={
+                    <ErrorMessage
+                      name="service_id"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
+                >
+                  <MenuItem value="" disabled>
+                    Select a service
+                  </MenuItem>
+                  {data.map((item, index) => (
+                    <MenuItem key={index} value={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  ))}
+                </Field>
 
-                <Field
-                  name="name"
-                  type="text"
-                  as={TextField}
-                  label="Name"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  helperText={<ErrorMessage name="name" />}
-                />
-                <Field
-                  name="price"
-                  type="number"
-                  as={TextField}
-                  label="Price"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  helperText={<ErrorMessage name="price" />}
-                />
-                <Field
-                  name="name"
-                  type="text"
-                  as={TextField}
-                  label="Name"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  helperText={<ErrorMessage name="name" />}
-                />
-                <Field
-                  name="price"
-                  type="number"
-                  as={TextField}
-                  label="Price"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  helperText={<ErrorMessage name="price" />}
-                />
                 <Button
                   type="submit"
                   variant="contained"
                   color="primary"
                   fullWidth
                   disabled={isSubmitting}
-                  sx={{ marginBottom: "8px" }}
+                  sx={{ marginTop: "8px" }}
                 >
-                  {isSubmitting ? "Saving..." : "Order"}
+                  {isSubmitting ? "Saving..." : "Save"}
                 </Button>
               </Form>
             )}

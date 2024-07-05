@@ -1,36 +1,36 @@
-import { Button, TextField } from "@mui/material";
-import React, { useState } from "react";
+import { Button } from "@mui/material";
 import { Order } from "@modal";
-import { Search } from "@mui/icons-material";
-
+import { OrderTable } from "../../components/ui";
+import { useEffect, useState } from "react";
+import { order } from "@service";
 const Index = () => {
   const [open, setOpen] = useState(false);
+  const [data, setData] = useState([]);
 
+  const getData = async () => {
+    try {
+      const response = await order.get();
+      console.log(response);
+      if (response.status === 200 && response?.data?.orders_list) {
+        setData(response?.data?.orders_list);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <>
       <Order open={open} handleClose={() => setOpen(false)} />
-      <div className="flex justify-between items-center">
-        <div className="w-[400px]">
-          <TextField
-            variant="outlined"
-            placeholder="Search..."
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <Search className="h-5 w-5 text-gray-400 absolute right-2 top-1/2 transform -translate-y-1/2" />
-              ),
-              disableUnderline: true,
-              style: {
-                padding: "4px 36px 4px 12px",
-                fontSize: "12px",
-                height: "35px",
-              },
-            }}
-          />
+      <div className=" flex flex-col gap-3">
+        <div className=" flex justify-end">
+          <Button variant="contained" onClick={() => setOpen(true)}>
+            Add Orders
+          </Button>
         </div>
-        <Button variant="contained" onClick={() => setOpen(true)}>
-          Add Orders
-        </Button>
+        <OrderTable data={data} />
       </div>
     </>
   );

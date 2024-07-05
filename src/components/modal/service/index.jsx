@@ -23,32 +23,30 @@ const Fade = ({ children, in: open }) => {
 const Index = ({ open, handleClose, item }) => {
   console.log(item, "item");
   const initialValues = {
-    name: item?.name ? item?.name : "",
-    price: item?.price ? item?.price : "",
+    name: item?.name || "",
+    price: item?.price || "",
   };
 
-  const handleSubmit = async (values) => {
-    const payload = { id: item.id, ...values };
-    if (item) {
-      try {
-        const response = await service.update(payload);
-        if (response.status === 200) {
-          window.location.reload();
-        }
-        handleClose();
-      } catch (error) {
-        console.log(error);
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      let response;
+      if (item) {
+        const payload = { id: item.id, ...values };
+        response = await service.update(payload);
+      } else {
+        response = await service.create(values);
       }
-    } else {
-      try {
-        const response = await service.create(values);
-        if (response.status === 201) {
-          window.location.reload();
-        }
+
+      if (response.status === 200 || response.status === 201) {
+        window.location.reload();
         handleClose();
-      } catch (error) {
-        console.error("Error creating service:", error);
+      } else {
+        console.error("Failed to save service:", response.data);
       }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
