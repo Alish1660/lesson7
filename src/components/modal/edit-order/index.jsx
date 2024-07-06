@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
   Modal,
   Backdrop,
@@ -6,14 +6,9 @@ import {
   Typography,
   Button,
   TextField,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { orderValidationSchema } from "../../../utils/validation";
-import service from "../../../service/service";
-import order from "../../../service/order";
-import { useState, useEffect } from "react";
 
 const Fade = ({ children, in: open }) => {
   const style = {
@@ -26,45 +21,32 @@ const Fade = ({ children, in: open }) => {
 
 const Index = ({ open, handleClose, item }) => {
   console.log(item, "item");
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await service.get();
-        if (response.status === 200 && response.data?.services) {
-          setData(response.data.services);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
-  }, []);
-
   const initialValues = {
-    client_full_name: item?.client_full_name || "",
-    client_phone_number: item?.client_phone_number || "",
-    amount: item?.amount || "",
+    amount: item?.amount || 1,
+    client_id: item?.client_id || "",
+    id: item?.id || "",
     service_id: item?.service_id || "",
+    status: item?.status || "in_process",
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
+      let response;
       if (item) {
         const payload = { id: item.id, ...values };
-        const response = await order.update(payload);
-        if (response.status === 201) {
-          window.location.reload();
-        }
+        response = await order.update(payload); // Assuming order.update is correctly implemented
       } else {
-        const response = await order.create(values);
-        if (response.status === 201) {
-          window.location.reload();
-        }
+        response = await order.create(values); // Adjusted to match your service structure
+      }
+
+      if (response.status === 200 || response.status === 201) {
+        window.location.reload(); // Reload the page after successful update
+        handleClose();
+      } else {
+        console.error("Failed to save order:", response.data);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error:", error);
     } finally {
       setSubmitting(false);
     }
@@ -95,35 +77,15 @@ const Index = ({ open, handleClose, item }) => {
           }}
         >
           <Typography variant="h5" sx={{ my: 2, textAlign: "center" }}>
-            {item ? "Edit Order" : "Create Order"}
+            Edit Order
           </Typography>
           <Formik
             initialValues={initialValues}
             onSubmit={handleSubmit}
-            validationSchema={orderValidationSchema}
+            validationSchema={orderValidationSchema} // Add validation schema for orders
           >
             {({ isSubmitting }) => (
               <Form>
-                <Field
-                  name="client_full_name"
-                  type="text"
-                  as={TextField}
-                  label="Full name"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  helperText={<ErrorMessage name="client_full_name" />}
-                />
-                <Field
-                  name="client_phone_number"
-                  type="text"
-                  as={TextField}
-                  label="Phone"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  helperText={<ErrorMessage name="client_phone_number" />}
-                />
                 <Field
                   name="amount"
                   type="number"
@@ -135,22 +97,45 @@ const Index = ({ open, handleClose, item }) => {
                   helperText={<ErrorMessage name="amount" />}
                 />
                 <Field
-                  name="service_id"
-                  as={Select}
+                  name="client_id"
+                  type="text"
+                  as={TextField}
+                  label="Client ID"
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  displayEmpty
-                >
-                  <MenuItem value="" disabled>
-                    Select a service
-                  </MenuItem>
-                  {data.map((item, index) => (
-                    <MenuItem key={index} value={item.id}>
-                      {item.name}
-                    </MenuItem>
-                  ))}
-                </Field>
+                  helperText={<ErrorMessage name="client_id" />}
+                />
+                <Field
+                  name="id"
+                  type="text"
+                  as={TextField}
+                  label="Order ID"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="id" />}
+                />
+                <Field
+                  name="service_id"
+                  type="text"
+                  as={TextField}
+                  label="Service ID"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="service_id" />}
+                />
+                <Field
+                  name="status"
+                  type="text"
+                  as={TextField}
+                  label="Status"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="status" />}
+                />
 
                 <Button
                   type="submit"
@@ -158,9 +143,9 @@ const Index = ({ open, handleClose, item }) => {
                   color="primary"
                   fullWidth
                   disabled={isSubmitting}
-                  sx={{ marginTop: "8px" }}
+                  sx={{ marginBottom: "8px" }}
                 >
-                  {isSubmitting ? "Saving..." : "Save"}
+                  {isSubmitting ? "Updating..." : "Update"}
                 </Button>
               </Form>
             )}
