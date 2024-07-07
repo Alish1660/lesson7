@@ -34,13 +34,13 @@ const Index = ({ open, handleClose, item }) => {
       let response;
       if (item) {
         const payload = { id: item.id, ...values };
-        response = await order.update(payload); // Assuming order.update is correctly implemented
+        response = await order.update(payload);
       } else {
-        response = await order.create(values); // Adjusted to match your service structure
+        response = await order.create(values);
       }
 
       if (response.status === 200 || response.status === 201) {
-        window.location.reload(); // Reload the page after successful update
+        window.location.reload();
         handleClose();
       } else {
         console.error("Failed to save order:", response.data);
@@ -82,7 +82,7 @@ const Index = ({ open, handleClose, item }) => {
           <Formik
             initialValues={initialValues}
             onSubmit={handleSubmit}
-            validationSchema={orderValidationSchema} // Add validation schema for orders
+            validationSchema={orderValidationSchema}
           >
             {({ isSubmitting }) => (
               <Form>

@@ -92,7 +92,13 @@ const Index = ({ open, handleClose, item }) => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  helperText={<ErrorMessage name="name" />}
+                  helperText={
+                    <ErrorMessage
+                      name="name"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
                 />
                 <Field
                   name="price"
@@ -102,7 +108,13 @@ const Index = ({ open, handleClose, item }) => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  helperText={<ErrorMessage name="price" />}
+                  helperText={
+                    <ErrorMessage
+                      name="price"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
                 />
 
                 <Button

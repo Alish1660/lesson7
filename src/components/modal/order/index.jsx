@@ -31,7 +31,7 @@ const Index = ({ open, handleClose, item }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await service.get();
+        const response = await service.get({ page: 1, limit: 10 });
         if (response.status === 200 && response.data?.services) {
           setData(response.data.services);
         }
@@ -112,7 +112,13 @@ const Index = ({ open, handleClose, item }) => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  helperText={<ErrorMessage name="client_full_name" />}
+                  helperText={
+                    <ErrorMessage
+                      name="client_full_name"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
                 />
                 <Field
                   name="client_phone_number"
@@ -122,7 +128,13 @@ const Index = ({ open, handleClose, item }) => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  helperText={<ErrorMessage name="client_phone_number" />}
+                  helperText={
+                    <ErrorMessage
+                      name="client_phone_number"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
                 />
                 <Field
                   name="amount"
@@ -132,7 +144,13 @@ const Index = ({ open, handleClose, item }) => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  helperText={<ErrorMessage name="amount" />}
+                  helperText={
+                    <ErrorMessage
+                      name="amount"
+                      component="p"
+                      className="text-[red] text-[15px]"
+                    />
+                  }
                 />
                 <Field
                   name="service_id"
